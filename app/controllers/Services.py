@@ -17,22 +17,27 @@ class Services(Controller):
             flash(message, level)
 
     def index(self):
-        return self.load_view('/index.html')
+        return self.load_view('/index.html', page_number=1)
 
     def search(self):
         print 'Services#search', request.form
-        origin = request.form['from']
-        destination = request.form['dest']
-        data = {
-                'origin': origin,
-                'destination': destination
-                }
-        url = "https://maps.googleapis.com/maps/api/directions/json?"+urlencode(data)+"&sensor=false&key=" + settings.env()['KEY']
-        print 'url', url
-        # notice this is 'requests' not 'request'
-        # we are using the request modules, 'get' function to send a request from our controller
-        # then we use ".content" to get the content we are looking for
-        response = requests.get(url).content
-        print 'response', response
+        leads_result = self.models['Service'].get_leads(request.form)
+        print 'leads_result', leads_result
+        return self.load_view('/index.html', page_number=leads_result['page_number'], pages=leads_result['pages'], leads=leads_result['result'], search_form=leads_result['search_form'])
+
+        # origin = request.form['from']
+        # destination = request.form['dest']
+        # data = {
+                # 'origin': origin,
+                # 'destination': destination
+                # }
+        # url = "https://maps.googleapis.com/maps/api/directions/json?"+urlencode(data)+"&sensor=false&key=" + settings.env()['KEY']
+        # print 'url', url
+        # # notice this is 'requests' not 'request'
+        # # we are using the request modules, 'get' function to send a request from our controller
+        # # then we use ".content" to get the content we are looking for
+        # response = requests.get(url).content
+        # print 'response', response
         # we then send the response back to our client which sent the initial post request
-        return response
+        # return response
+        pass
